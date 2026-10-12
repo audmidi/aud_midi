@@ -12,9 +12,9 @@ environment:
   sdk: ^3.12.2
 
 dependencies:
-  aud_midi_android: ^0.1.1
-  aud_midi_apple: ^0.1.1
-  aud_midi_core: ^0.1.1
+  aud_midi_android: ^0.2.0
+  aud_midi_apple: ^0.2.0
+  aud_midi_core: ^0.2.0
   aud_midi_linux: ^0.1.0
   aud_midi_network: ^0.1.0
   aud_midi_standard: ^0.1.0

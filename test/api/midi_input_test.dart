@@ -109,6 +109,10 @@ Future<void> _failOpen(Midi midi) => midi.withBackend(
   ).failWith(openPort: const MidiNativeError(api: 'open', code: 3)),
 );
 
+Future<void> _failDetach(Midi midi, Object? error) => midi.withBackend(
+  (backend) => _fake(backend).failWith(detachNativeTap: error),
+);
+
 Future<Map<MidiPortId, MidiNativeTap>> _taps(Midi midi) =>
     midi.withBackend((backend) => _fake(backend).taps);
 
@@ -393,6 +397,20 @@ void main() {
             input.attachNativeTap(tap),
             throwsA(isA<MidiUnsupported>()),
           );
+        });
+
+        test('detach again after a failed detach', () async {
+          final handle = await input.attachNativeTap(tap);
+          await _failDetach(
+            midi,
+            const MidiNativeError(api: 'detach', code: 5),
+          );
+          await expectLater(handle.detach(), throwsA(isA<MidiNativeError>()));
+          expect(handle.isDetached, isFalse);
+          await _failDetach(midi, null);
+          await handle.detach();
+          expect(handle.isDetached, isTrue);
+          expect(await _taps(midi), isEmpty);
         });
 
         test('fail for a port that is gone', () async {

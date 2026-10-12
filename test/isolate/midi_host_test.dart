@@ -465,6 +465,49 @@ void main() {
         );
         await host.done;
       });
+
+      test('forget the tap of a port that went', () async {
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+        host = MidiHost(backend: fake, id: 45);
+        await host.start();
+        proxy = (await hello()).proxy;
+        await ask(attach);
+        fake.removePort(input.id);
+        await expectLater(ask(detach), throwsA(isA<MidiPortGone>()));
+        expect(await ask(detach), isNull);
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+      });
+
+      test('detach a tap whose proxy left during the attach', () async {
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+        host = MidiHost(backend: fake, id: 44);
+        await host.start();
+        proxy = (await hello()).proxy;
+        fake.holdCalls();
+        final attaching = ask(attach);
+        await pumpEventQueue();
+        final leaving = ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await pumpEventQueue();
+        fake.releaseCalls();
+        await attaching;
+        await leaving;
+        expect(fake.taps, isEmpty);
+        expect(fake.calls.where((call) => call.startsWith('detach')), [
+          'detachNativeTap ${input.id}',
+        ]);
+        await host.done;
+      });
     });
 
     group('nativeTapBackendsOf(backend)', () {

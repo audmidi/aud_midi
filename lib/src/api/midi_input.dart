@@ -106,17 +106,26 @@ final class MidiNativeTapHandle {
   /// so that its memory may go afterwards. Does nothing the second time.
   ///
   /// Throws a `MidiPortGone` when the port disappeared meanwhile; the
-  /// backend detached the tap with the port then.
+  /// backend detached the tap with the port then. Any other failure
+  /// leaves the tap attached, so that [detach] may be called again.
   Future<void> detach() async {
     if (_isDetached) return;
     _isDetached = true;
-    await input._midi._call<void>(
-      (request) => MidiDetachNativeTapCommand(
-        proxy: input._midi._id,
-        request: request,
-        port: input.id,
-      ),
-    );
+    try {
+      await input._midi._call<void>(
+        (request) => MidiDetachNativeTapCommand(
+          proxy: input._midi._id,
+          request: request,
+          port: input.id,
+        ),
+      );
+    } on MidiPortGone {
+      rethrow;
+    } on Object {
+      // The tap may still be attached; a later detach tries again.
+      _isDetached = false;
+      rethrow;
+    }
   }
 
   // ...........................................................................

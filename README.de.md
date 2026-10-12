@@ -129,6 +129,20 @@ MIDI-Isolate sofort und gehen 100 ms vor ihrer Zeit an das Betriebssystem,
 so bleiben sie abbrechbar. Im Web läuft die Engine im Hauptthread, wo Web
 MIDI zu Hause ist.
 
+Ein nativer Verbraucher, z. B. eine Audio-Engine, nimmt die Rohdaten eines
+Eingangs ohne Isolate dazwischen ab: Wo `input.supportsNativeTap` gilt
+(CoreMIDI, `android.media.midi`), registriert `input.attachNativeTap(
+MidiNativeTap(function: ..., user: ...))` eine C-Funktion, die das Backend
+auf seinem Empfangs-Thread mit UMP-Wörtern oder MIDI-1.0-Bytes und einem
+Host-Zeitstempel in Nanosekunden aufruft, und mit `gone`, wenn der Port
+verschwindet; `detach()` des Handles ist erst nach dem letzten Aufruf
+abgeschlossen. Die Taps eines Proxys gehen mit ihm.
+
+Auf iOS zeigt `midi.bluetooth!.showSystemDevicePicker()` die
+Bluetooth-MIDI-Geräteauswahl des Betriebssystems; die dort verbundenen
+Geräte erscheinen als Ports. Anderswo wirft es eine `MidiUnsupported`;
+dort sucht man stattdessen mit `midi.bluetooth!.scan()`.
+
 ## Mitwirken
 
 Siehe [doc/guides/develop-guide.md](doc/guides/develop-guide.md).

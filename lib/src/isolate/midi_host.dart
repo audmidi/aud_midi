@@ -259,9 +259,21 @@ final class MidiHost {
         return action(engine.backend);
       case MidiAttachNativeTapCommand(:final port, :final tap):
         await _nativeTaps.attachNativeTap(port, tap);
-        proxy.taps.add(port);
+        if (proxy.isLeaving) {
+          // The proxy left during the attach; its tap leaves with it.
+          await _nativeTaps.detachNativeTap(port);
+        } else {
+          proxy.taps.add(port);
+        }
       case MidiDetachNativeTapCommand(:final port):
-        if (proxy.taps.remove(port)) await _nativeTaps.detachNativeTap(port);
+        if (!proxy.taps.contains(port)) return null;
+        try {
+          await _nativeTaps.detachNativeTap(port);
+        } on MidiPortGone {
+          proxy.taps.remove(port);
+          rethrow;
+        }
+        proxy.taps.remove(port);
       case MidiCreateVirtualPortCommand(:final spec):
         return engine.createVirtualPort(spec);
       case MidiRemoveVirtualPortCommand(:final port):

@@ -137,6 +137,11 @@ timestamp in nanoseconds, and with `gone` when the port disappears; the
 handle's `detach()` completes after the last call. The taps of a proxy
 leave with it.
 
+On iOS, `midi.bluetooth!.showSystemDevicePicker()` shows the Bluetooth
+MIDI device picker of the operating system; the devices connected there
+appear as ports. Elsewhere it throws a `MidiUnsupported`; scan with
+`midi.bluetooth!.scan()` there instead.
+
 ## Contributing
 
 See [doc/guides/develop-guide.md](doc/guides/develop-guide.md).
