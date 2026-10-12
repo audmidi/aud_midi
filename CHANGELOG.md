@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.1 - 2026-10-12
 
 ### Added
 
@@ -27,8 +27,11 @@
 - Add review fixes of ticket 26
 
 - A failed detach of a native tap other than MidiPortGone leaves the tap attached, so that detach can be called again
+
 - A tap whose proxy left during the attach is detached at once
+
 - aud_midi_core, aud_midi_android and aud_midi_apple ^0.2.0
+
 - README: native taps in German, the Bluetooth system picker in both languages
 
 ## 0.1.0 - 2026-10-07
