@@ -172,6 +172,10 @@ void main() {
         MidiStopScanCommand(proxy: proxy, request: request),
         isA<MidiHostRequest>(),
       );
+      expect(
+        MidiShowBluetoothPickerCommand(proxy: proxy, request: request),
+        isA<MidiHostRequest>(),
+      );
       final connect = MidiConnectPeripheralCommand(
         proxy: proxy,
         request: request,

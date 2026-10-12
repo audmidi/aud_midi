@@ -268,6 +268,12 @@ final class MidiHost {
         await engine.removeVirtualPort(port);
       case MidiStopScanCommand():
         await _bluetooth.stopScan();
+      case MidiShowBluetoothPickerCommand():
+        if (_bluetooth case final MidiBluetoothSystemPicker picker) {
+          await picker.showSystemDevicePicker();
+        } else {
+          throw const MidiUnsupported('Bluetooth MIDI device picker');
+        }
       case MidiConnectPeripheralCommand(:final peripheral, :final timeout):
         return _bluetooth.connect(peripheral, timeout: timeout);
       case MidiDisconnectPeripheralCommand(:final peripheral):

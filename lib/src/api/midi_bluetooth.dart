@@ -37,6 +37,19 @@ final class MidiBluetooth {
   );
 
   // ...........................................................................
+  /// Shows the Bluetooth MIDI device picker of the operating system and
+  /// completes once the user dismissed it.
+  ///
+  /// On iOS this is Apple's `CABTMIDICentralViewController`; it scans,
+  /// pairs and connects, and the connected peripherals appear as ports.
+  /// It is the reliable way to connect a peripheral that asks for pairing.
+  /// Throws a `MidiUnsupported` where the platform has no such picker.
+  Future<void> showSystemDevicePicker() => _midi._call<void>(
+    (request) =>
+        MidiShowBluetoothPickerCommand(proxy: _midi._id, request: request),
+  );
+
+  // ...........................................................................
   /// Connects the peripheral [peripheralId] and returns its ports.
   ///
   /// Throws a `MidiException` when the connection does not succeed within

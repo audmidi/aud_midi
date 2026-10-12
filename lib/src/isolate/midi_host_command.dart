@@ -355,6 +355,17 @@ final class MidiStopScanCommand extends MidiHostRequest {
 }
 
 // #############################################################################
+/// Shows the Bluetooth MIDI device picker of the operating system; answers
+/// once the user dismissed it.
+final class MidiShowBluetoothPickerCommand extends MidiHostRequest {
+  /// Creates the command.
+  const MidiShowBluetoothPickerCommand({
+    required super.proxy,
+    required super.request,
+  });
+}
+
+// #############################################################################
 /// Connects the Bluetooth LE MIDI [peripheral]; the answer is its ports.
 final class MidiConnectPeripheralCommand extends MidiHostRequest {
   /// Creates the command.

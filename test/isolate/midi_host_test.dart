@@ -81,6 +81,31 @@ final class _FailingScan implements MidiBluetoothBackend {
   Future<void> disconnect(String peripheralId) async {}
 }
 
+/// A Bluetooth backend with the device picker of the operating system.
+final class _Picking
+    implements MidiBluetoothBackend, MidiBluetoothSystemPicker {
+  int shown = 0;
+
+  @override
+  Future<void> showSystemDevicePicker() async => shown++;
+
+  @override
+  Stream<MidiBlePeripheralInfo> scan({Duration? timeout}) =>
+      const Stream.empty();
+
+  @override
+  Future<void> stopScan() async {}
+
+  @override
+  Future<List<MidiPortInfo>> connect(
+    String peripheralId, {
+    Duration timeout = const Duration(seconds: 10),
+  }) async => const [];
+
+  @override
+  Future<void> disconnect(String peripheralId) async {}
+}
+
 /// An error that refuses to be sent.
 final class _Poison {
   const _Poison();
@@ -620,6 +645,34 @@ void main() {
               (e) => e.feature,
               'feature',
               'Bluetooth LE MIDI',
+            ),
+          ),
+        );
+      });
+    });
+
+    group('handle(MidiShowBluetoothPickerCommand)', () {
+      test('shows the picker of the backend', () async {
+        final picking = _Picking();
+        backend.bluetoothOverride = picking;
+        await ask(
+          (request) =>
+              MidiShowBluetoothPickerCommand(proxy: proxy, request: request),
+        );
+        expect(picking.shown, 1);
+      });
+
+      test('fails without a picker', () async {
+        await expectLater(
+          ask(
+            (request) =>
+                MidiShowBluetoothPickerCommand(proxy: proxy, request: request),
+          ),
+          throwsA(
+            isA<MidiUnsupported>().having(
+              (e) => e.feature,
+              'feature',
+              'Bluetooth MIDI device picker',
             ),
           ),
         );

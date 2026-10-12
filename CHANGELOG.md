@@ -7,7 +7,12 @@
 - Add native taps to MidiInput
 
 - MidiInput.supportsNativeTap and attachNativeTap through the MIDI isolate; MidiNativeTapHandle.detach
+
 - The constraints on core, apple and android at ^0.1.1
+
+- Add MidiBluetooth.showSystemDevicePicker
+
+- The system device picker of the backend, through the MIDI isolate
 
 ## 0.1.0 - 2026-10-07
 
