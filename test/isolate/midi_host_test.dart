@@ -81,6 +81,31 @@ final class _FailingScan implements MidiBluetoothBackend {
   Future<void> disconnect(String peripheralId) async {}
 }
 
+/// A Bluetooth backend with the device picker of the operating system.
+final class _Picking
+    implements MidiBluetoothBackend, MidiBluetoothSystemPicker {
+  int shown = 0;
+
+  @override
+  Future<void> showSystemDevicePicker() async => shown++;
+
+  @override
+  Stream<MidiBlePeripheralInfo> scan({Duration? timeout}) =>
+      const Stream.empty();
+
+  @override
+  Future<void> stopScan() async {}
+
+  @override
+  Future<List<MidiPortInfo>> connect(
+    String peripheralId, {
+    Duration timeout = const Duration(seconds: 10),
+  }) async => const [];
+
+  @override
+  Future<void> disconnect(String peripheralId) async {}
+}
+
 /// An error that refuses to be sent.
 final class _Poison {
   const _Poison();
@@ -379,6 +404,146 @@ void main() {
       });
     });
 
+    group('handle(MidiAttachNativeTapCommand, MidiDetachNativeTapCommand)', () {
+      const tap = MidiNativeTap(function: 1, user: 2);
+
+      MidiAttachNativeTapCommand attach(int request, [int? of]) =>
+          MidiAttachNativeTapCommand(
+            proxy: of ?? proxy,
+            request: request,
+            port: input.id,
+            tap: tap,
+          );
+
+      MidiDetachNativeTapCommand detach(int request, [int? of]) =>
+          MidiDetachNativeTapCommand(
+            proxy: of ?? proxy,
+            request: request,
+            port: input.id,
+          );
+
+      test('refuse a backend without native taps', () async {
+        expect((await hello()).nativeTapBackends, isEmpty);
+        await expectLater(ask(attach), throwsA(isA<MidiUnsupported>()));
+        expect(await ask(detach), isNull);
+      });
+
+      test('attach the tap of a proxy until it detaches or leaves', () async {
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+        host = MidiHost(backend: fake, id: 43);
+        await host.start();
+        final snapshot = await hello();
+        proxy = snapshot.proxy;
+        expect(snapshot.nativeTapBackends, {'fake'});
+        await ask(attach);
+        expect(fake.taps, {input.id: tap});
+        await expectLater(ask(attach), throwsA(isA<StateError>()));
+        await ask(detach);
+        expect(fake.taps, isEmpty);
+        await ask(detach);
+        expect(fake.calls.where((call) => call.startsWith('detach')), [
+          'detachNativeTap ${input.id}',
+        ]);
+        // Another proxy cannot detach it; the owner's goodbye does.
+        await ask(attach);
+        final second = (await hello()).proxy;
+        await ask((request) => detach(request, second));
+        expect(fake.taps, {input.id: tap});
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        expect(fake.taps, isEmpty);
+        proxy = second;
+        // A port that went: the goodbye tolerates the missing tap.
+        await ask(attach);
+        fake.removePort(input.id);
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+      });
+
+      test('forget the tap of a port that went', () async {
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+        host = MidiHost(backend: fake, id: 45);
+        await host.start();
+        proxy = (await hello()).proxy;
+        await ask(attach);
+        fake.removePort(input.id);
+        await expectLater(ask(detach), throwsA(isA<MidiPortGone>()));
+        expect(await ask(detach), isNull);
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+      });
+
+      test('say goodbye when a tap fails to detach', () async {
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+        host = MidiHost(backend: fake, id: 46);
+        await host.start();
+        proxy = (await hello()).proxy;
+        await ask(attach);
+        fake.failWith(detachNativeTap: StateError('boom'));
+        expect(
+          await ask(
+            (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+          ),
+          isTrue,
+        );
+        await host.done;
+      });
+
+      test('detach a tap whose proxy left during the attach', () async {
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+        host = MidiHost(backend: fake, id: 44);
+        await host.start();
+        proxy = (await hello()).proxy;
+        fake.holdCalls();
+        final attaching = ask(attach);
+        await pumpEventQueue();
+        final leaving = ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await pumpEventQueue();
+        fake.releaseCalls();
+        await attaching;
+        await leaving;
+        expect(fake.taps, isEmpty);
+        expect(fake.calls.where((call) => call.startsWith('detach')), [
+          'detachNativeTap ${input.id}',
+        ]);
+        await host.done;
+      });
+    });
+
+    group('nativeTapBackendsOf(backend)', () {
+      test('names the backends with native taps, inside composites', () {
+        expect(MidiHost.nativeTapBackendsOf(backend), isEmpty);
+        expect(MidiHost.nativeTapBackendsOf(fake), {'fake'});
+        final composite = MidiCompositeBackend(
+          backends: [FakeMidiBackend(name: 'os')],
+          optionalBackends: [
+            backend,
+            FakeMidiBackend(name: 'ble'),
+          ],
+        );
+        expect(MidiHost.nativeTapBackendsOf(composite), {'os', 'ble'});
+      });
+    });
+
     group('handle(MidiOpenInputCommand)', () {
       test('forwards the events and packets of the input', () async {
         for (final raw in [false, true]) {
@@ -542,6 +707,34 @@ void main() {
               (e) => e.feature,
               'feature',
               'Bluetooth LE MIDI',
+            ),
+          ),
+        );
+      });
+    });
+
+    group('handle(MidiShowBluetoothPickerCommand)', () {
+      test('shows the picker of the backend', () async {
+        final picking = _Picking();
+        backend.bluetoothOverride = picking;
+        await ask(
+          (request) =>
+              MidiShowBluetoothPickerCommand(proxy: proxy, request: request),
+        );
+        expect(picking.shown, 1);
+      });
+
+      test('fails without a picker', () async {
+        await expectLater(
+          ask(
+            (request) =>
+                MidiShowBluetoothPickerCommand(proxy: proxy, request: request),
+          ),
+          throwsA(
+            isA<MidiUnsupported>().having(
+              (e) => e.feature,
+              'feature',
+              'Bluetooth MIDI device picker',
             ),
           ),
         );

@@ -49,6 +49,15 @@ void main() {
         });
       });
 
+      group('showSystemDevicePicker()', () {
+        test('fails where the backend has no picker', () async {
+          await expectLater(
+            midi.bluetooth!.showSystemDevicePicker(),
+            throwsA(isA<MidiUnsupported>()),
+          );
+        });
+      });
+
       group('connect(peripheralId), disconnect(peripheralId)', () {
         test('add and remove the ports of a peripheral', () async {
           final ports = await midi.bluetooth!.connect(

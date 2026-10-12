@@ -14,6 +14,7 @@
   // 1-3 bullet points: the problem space.
   "domain": [
     "USB, BLE, virtual and network MIDI, MIDI 1.0 and 2.0, in its own isolate",
+    "Native taps of input ports for native consumers, attached through the MIDI isolate",
     "Backend composition per platform: OS backend + network session + BLE"
   ],
 
@@ -22,7 +23,7 @@
   "interfaces": {
     "uses": {
       "aud_midi_standard": "messages, models, codecs (re-exported)",
-      "aud_midi_core": "MidiEngine, MidiCompositeBackend, contracts (re-exported)",
+      "aud_midi_core": "MidiEngine, MidiCompositeBackend, MidiNativeTapBackend, contracts (re-exported)",
       "aud_midi_network": "MidiNetworkSessionBackend on macOS, Android, Windows, Linux",
       "aud_midi_apple": "AppleMidiBackend, MidiBonjourAdvertiser",
       "aud_midi_android": "AndroidMidiBackend, MidiAndroidServiceAdvertiser",

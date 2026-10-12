@@ -29,6 +29,7 @@ import 'midi_host_snapshot.dart';
 ///   changes go to every proxy.
 /// - Input events, raw packets, scan results and browse results go to the
 ///   proxy that asked for them, as host streams.
+/// - Native taps belong to the proxy that attached them and leave with it.
 /// - The notices of one turn of the event loop leave as one batch.
 /// - When the last proxy left, the host closes the engine in its shutdown
 ///   order and completes [done].
@@ -141,6 +142,23 @@ final class MidiHost {
   MidiNetworkBackend get _network =>
       engine.network ?? (throw const MidiUnsupported('Network sessions'));
 
+  /// The native taps of the backend, or throws.
+  MidiNativeTapBackend get _nativeTaps => switch (engine.backend) {
+    final MidiNativeTapBackend taps => taps,
+    _ => throw const MidiUnsupported('Native taps'),
+  };
+
+  /// The names of the backends behind [backend] whose inputs take native
+  /// taps; a composite contributes its active backends.
+  static Set<String> nativeTapBackendsOf(MidiBackend backend) =>
+      switch (backend) {
+        MidiCompositeBackend(:final activeBackends) => {
+          for (final backend in activeBackends) ...nativeTapBackendsOf(backend),
+        },
+        MidiNativeTapBackend() => {backend.name},
+        _ => const {},
+      };
+
   /// Registers the proxy of [command] and answers with a snapshot.
   void _hello(MidiHelloCommand command) {
     if (_isClosing || isClosed) {
@@ -166,6 +184,7 @@ final class MidiHost {
           hasVirtualPorts: engine.virtualPorts != null,
           hasBluetooth: engine.bluetooth != null,
           session: engine.network?.session,
+          nativeTapBackends: nativeTapBackendsOf(engine.backend),
         ),
       ),
     );
@@ -176,11 +195,17 @@ final class MidiHost {
   /// Releases [proxy], shuts down after the last one and answers
   /// [request] with whether the host shut down.
   Future<void> _goodbye(_HostProxy proxy, int request) async {
-    await proxy.release();
-    _proxies.remove(proxy.id);
-    final isLast = _proxies.isEmpty;
+    var isLast = false;
     try {
-      if (isLast) await _shutDown();
+      // A failing release still removes the proxy and answers, so that
+      // Midi.close never waits for a reply that does not come.
+      try {
+        await proxy.release();
+      } finally {
+        _proxies.remove(proxy.id);
+        isLast = _proxies.isEmpty;
+        if (isLast) await _shutDown();
+      }
       proxy.post(MidiReplyNotice(request: request, value: isLast));
     } on Object catch (error, stack) {
       proxy.post(
@@ -238,12 +263,35 @@ final class MidiHost {
         return engine.diagnosticsSnapshot();
       case MidiWithBackendCommand(:final action):
         return action(engine.backend);
+      case MidiAttachNativeTapCommand(:final port, :final tap):
+        await _nativeTaps.attachNativeTap(port, tap);
+        if (proxy.isLeaving) {
+          // The proxy left during the attach; its tap leaves with it.
+          await _nativeTaps.detachNativeTap(port);
+        } else {
+          proxy.taps.add(port);
+        }
+      case MidiDetachNativeTapCommand(:final port):
+        if (!proxy.taps.contains(port)) return null;
+        try {
+          await _nativeTaps.detachNativeTap(port);
+        } on MidiPortGone {
+          proxy.taps.remove(port);
+          rethrow;
+        }
+        proxy.taps.remove(port);
       case MidiCreateVirtualPortCommand(:final spec):
         return engine.createVirtualPort(spec);
       case MidiRemoveVirtualPortCommand(:final port):
         await engine.removeVirtualPort(port);
       case MidiStopScanCommand():
         await _bluetooth.stopScan();
+      case MidiShowBluetoothPickerCommand():
+        if (_bluetooth case final MidiBluetoothSystemPicker picker) {
+          await picker.showSystemDevicePicker();
+        } else {
+          throw const MidiUnsupported('Bluetooth MIDI device picker');
+        }
       case MidiConnectPeripheralCommand(:final peripheral, :final timeout):
         return _bluetooth.connect(peripheral, timeout: timeout);
       case MidiDisconnectPeripheralCommand(:final peripheral):
@@ -351,13 +399,24 @@ final class _HostProxy {
     _pending.add(served);
   }
 
-  /// Waits for the pending commands, then ends the streams and closes the
-  /// outputs of the proxy.
+  /// Waits for the pending commands, then ends the streams, detaches the
+  /// taps and closes the outputs of the proxy.
   Future<void> release() async {
     isLeaving = true;
     await Future.wait([..._pending]);
     for (final stream in [..._streams.keys]) {
       await cancelStream(stream);
+    }
+    for (final port in [...taps]) {
+      taps.remove(port);
+      try {
+        await host._nativeTaps.detachNativeTap(port);
+      } on MidiException {
+        // The port is gone; its tap went with it.
+      } on Object catch (error, stack) {
+        // The other taps and the outputs are still released.
+        host.reportError(error, stack);
+      }
     }
     for (final port in [..._outputs.keys]) {
       await closeOutput(port);
@@ -486,6 +545,9 @@ final class _HostProxy {
 
   /// Whether the proxy is leaving; its commands are ignored then.
   bool isLeaving = false;
+
+  /// The input ports with a native tap of the proxy.
+  final taps = <MidiPortId>{};
 
   // ...........................................................................
   final _streams = <int, _HostStream>{};

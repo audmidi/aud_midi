@@ -17,6 +17,11 @@ part of 'midi.dart';
 ///
 /// Every event keeps the time the operating system received it at, also
 /// when the app's isolate was busy.
+///
+/// A native consumer attaches a [MidiNativeTap] with [attachNativeTap]
+/// where [supportsNativeTap] holds: the backend then calls the tap on its
+/// own receive thread with the raw data of the port, without any isolate
+/// in between.
 final class MidiInput {
   MidiInput._(this._midi, this._info)
     : _events = _MidiInputFeed(_midi, _info.id, raw: false),
@@ -31,6 +36,27 @@ final class MidiInput {
   /// [messages] does.
   Stream<MidiEvent> messagesWith(MidiInputOptions options) =>
       _MidiInputFeed<MidiEvent>(_midi, id, raw: false, options: options).stream;
+
+  /// Attaches the native [tap] to the port in the MIDI isolate and returns
+  /// the handle that detaches it; the tap also leaves when this proxy
+  /// closes.
+  ///
+  /// Throws a `MidiUnsupported` when the backend has no native taps
+  /// ([supportsNativeTap]) or refuses them on this port, a `MidiPortGone`
+  /// when the port disappeared and a [StateError] when the port has a tap
+  /// already.
+  Future<MidiNativeTapHandle> attachNativeTap(MidiNativeTap tap) async {
+    if (!supportsNativeTap) throw MidiUnsupported('Native taps on $id');
+    await _midi._call<void>(
+      (request) => MidiAttachNativeTapCommand(
+        proxy: _midi._id,
+        request: request,
+        port: id,
+        tap: tap,
+      ),
+    );
+    return MidiNativeTapHandle._(this, tap);
+  }
 
   /// Ends the streams of the port in this isolate and closes the port when
   /// no other isolate listens; a new listener opens it again.
@@ -57,11 +83,63 @@ final class MidiInput {
   /// [MidiPortCapabilities.ump].
   Stream<MidiPacket> get packets => _packets.stream;
 
+  /// Whether the backend of the port calls native taps on its receive
+  /// thread: CoreMIDI and `android.media.midi` do, the network session
+  /// and the web do not. A backend may still refuse a single port in
+  /// [attachNativeTap].
+  bool get supportsNativeTap => _midi._nativeTapBackends.contains(id.backend);
+
   // ...........................................................................
   final Midi _midi;
   MidiPortInfo _info;
   final _MidiInputFeed<MidiEvent> _events;
   final _MidiInputFeed<MidiPacket> _packets;
+}
+
+// #############################################################################
+/// A native tap attached to a [MidiInput]; [detach] ends it.
+final class MidiNativeTapHandle {
+  MidiNativeTapHandle._(this.input, this.tap);
+
+  // ...........................................................................
+  /// Detaches the tap; completes after the last call of the tap returned,
+  /// so that its memory may go afterwards. Does nothing the second time.
+  ///
+  /// Throws a `MidiPortGone` when the port disappeared meanwhile; the
+  /// backend detached the tap with the port then. Any other failure
+  /// leaves the tap attached, so that [detach] may be called again.
+  Future<void> detach() async {
+    if (_isDetached) return;
+    _isDetached = true;
+    try {
+      await input._midi._call<void>(
+        (request) => MidiDetachNativeTapCommand(
+          proxy: input._midi._id,
+          request: request,
+          port: input.id,
+        ),
+      );
+    } on MidiPortGone {
+      rethrow;
+    } on Object {
+      // The tap may still be attached; a later detach tries again.
+      _isDetached = false;
+      rethrow;
+    }
+  }
+
+  // ...........................................................................
+  /// The input the tap is attached to.
+  final MidiInput input;
+
+  /// The tap.
+  final MidiNativeTap tap;
+
+  /// Whether [detach] was called.
+  bool get isDetached => _isDetached;
+
+  // ...........................................................................
+  bool _isDetached = false;
 }
 
 // #############################################################################
