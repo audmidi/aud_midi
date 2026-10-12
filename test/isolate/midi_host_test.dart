@@ -484,6 +484,25 @@ void main() {
         await host.done;
       });
 
+      test('say goodbye when a tap fails to detach', () async {
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+        host = MidiHost(backend: fake, id: 46);
+        await host.start();
+        proxy = (await hello()).proxy;
+        await ask(attach);
+        fake.failWith(detachNativeTap: StateError('boom'));
+        expect(
+          await ask(
+            (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+          ),
+          isTrue,
+        );
+        await host.done;
+      });
+
       test('detach a tap whose proxy left during the attach', () async {
         await ask(
           (request) => MidiGoodbyeCommand(proxy: proxy, request: request),

@@ -20,6 +20,8 @@
 
 - Add review fixes of ticket 26
 
+- Add a goodbye that answers when a tap fails to detach
+
 ## 0.1.0 - 2026-10-07
 
 ### Changed

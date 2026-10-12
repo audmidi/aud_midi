@@ -195,11 +195,17 @@ final class MidiHost {
   /// Releases [proxy], shuts down after the last one and answers
   /// [request] with whether the host shut down.
   Future<void> _goodbye(_HostProxy proxy, int request) async {
-    await proxy.release();
-    _proxies.remove(proxy.id);
-    final isLast = _proxies.isEmpty;
+    var isLast = false;
     try {
-      if (isLast) await _shutDown();
+      // A failing release still removes the proxy and answers, so that
+      // Midi.close never waits for a reply that does not come.
+      try {
+        await proxy.release();
+      } finally {
+        _proxies.remove(proxy.id);
+        isLast = _proxies.isEmpty;
+        if (isLast) await _shutDown();
+      }
       proxy.post(MidiReplyNotice(request: request, value: isLast));
     } on Object catch (error, stack) {
       proxy.post(
@@ -407,6 +413,9 @@ final class _HostProxy {
         await host._nativeTaps.detachNativeTap(port);
       } on MidiException {
         // The port is gone; its tap went with it.
+      } on Object catch (error, stack) {
+        // The other taps and the outputs are still released.
+        host.reportError(error, stack);
       }
     }
     for (final port in [..._outputs.keys]) {
