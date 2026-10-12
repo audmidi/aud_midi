@@ -379,6 +379,84 @@ void main() {
       });
     });
 
+    group('handle(MidiAttachNativeTapCommand, MidiDetachNativeTapCommand)', () {
+      const tap = MidiNativeTap(function: 1, user: 2);
+
+      MidiAttachNativeTapCommand attach(int request, [int? of]) =>
+          MidiAttachNativeTapCommand(
+            proxy: of ?? proxy,
+            request: request,
+            port: input.id,
+            tap: tap,
+          );
+
+      MidiDetachNativeTapCommand detach(int request, [int? of]) =>
+          MidiDetachNativeTapCommand(
+            proxy: of ?? proxy,
+            request: request,
+            port: input.id,
+          );
+
+      test('refuse a backend without native taps', () async {
+        expect((await hello()).nativeTapBackends, isEmpty);
+        await expectLater(ask(attach), throwsA(isA<MidiUnsupported>()));
+        expect(await ask(detach), isNull);
+      });
+
+      test('attach the tap of a proxy until it detaches or leaves', () async {
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+        host = MidiHost(backend: fake, id: 43);
+        await host.start();
+        final snapshot = await hello();
+        proxy = snapshot.proxy;
+        expect(snapshot.nativeTapBackends, {'fake'});
+        await ask(attach);
+        expect(fake.taps, {input.id: tap});
+        await expectLater(ask(attach), throwsA(isA<StateError>()));
+        await ask(detach);
+        expect(fake.taps, isEmpty);
+        await ask(detach);
+        expect(fake.calls.where((call) => call.startsWith('detach')), [
+          'detachNativeTap ${input.id}',
+        ]);
+        // Another proxy cannot detach it; the owner's goodbye does.
+        await ask(attach);
+        final second = (await hello()).proxy;
+        await ask((request) => detach(request, second));
+        expect(fake.taps, {input.id: tap});
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        expect(fake.taps, isEmpty);
+        proxy = second;
+        // A port that went: the goodbye tolerates the missing tap.
+        await ask(attach);
+        fake.removePort(input.id);
+        await ask(
+          (request) => MidiGoodbyeCommand(proxy: proxy, request: request),
+        );
+        await host.done;
+      });
+    });
+
+    group('nativeTapBackendsOf(backend)', () {
+      test('names the backends with native taps, inside composites', () {
+        expect(MidiHost.nativeTapBackendsOf(backend), isEmpty);
+        expect(MidiHost.nativeTapBackendsOf(fake), {'fake'});
+        final composite = MidiCompositeBackend(
+          backends: [FakeMidiBackend(name: 'os')],
+          optionalBackends: [
+            backend,
+            FakeMidiBackend(name: 'ble'),
+          ],
+        );
+        expect(MidiHost.nativeTapBackendsOf(composite), {'os', 'ble'});
+      });
+    });
+
     group('handle(MidiOpenInputCommand)', () {
       test('forwards the events and packets of the input', () async {
         for (final raw in [false, true]) {

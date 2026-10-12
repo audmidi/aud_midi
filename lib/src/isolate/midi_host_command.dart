@@ -282,6 +282,42 @@ final class MidiWithBackendCommand extends MidiHostRequest {
 }
 
 // #############################################################################
+/// Attaches the native [tap] to the input [port] in the backend; the host
+/// detaches it again when the proxy leaves.
+final class MidiAttachNativeTapCommand extends MidiHostRequest {
+  /// Creates the command.
+  const MidiAttachNativeTapCommand({
+    required super.proxy,
+    required super.request,
+    required this.port,
+    required this.tap,
+  });
+
+  // ...........................................................................
+  /// The input port.
+  final MidiPortId port;
+
+  /// The tap.
+  final MidiNativeTap tap;
+}
+
+// #############################################################################
+/// Detaches the native tap of the input [port]; the answer comes after the
+/// last call of the tap returned.
+final class MidiDetachNativeTapCommand extends MidiHostRequest {
+  /// Creates the command.
+  const MidiDetachNativeTapCommand({
+    required super.proxy,
+    required super.request,
+    required this.port,
+  });
+
+  // ...........................................................................
+  /// The input port.
+  final MidiPortId port;
+}
+
+// #############################################################################
 /// Creates the virtual port [spec] describes; the answer is the port.
 final class MidiCreateVirtualPortCommand extends MidiHostRequest {
   /// Creates the command.

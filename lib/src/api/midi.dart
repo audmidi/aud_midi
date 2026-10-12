@@ -241,6 +241,7 @@ final class Midi {
   int _nextRequest = 1;
   int _nextStream = 1;
   String _backendName = '';
+  Set<String> _nativeTapBackends = const {};
   MidiCapabilities _capabilities = const MidiCapabilities.none();
   MidiVirtualPorts? _virtualPorts;
   MidiBluetooth? _bluetooth;
@@ -448,6 +449,7 @@ final class Midi {
   void _start(MidiHostSnapshot snapshot) {
     _id = snapshot.proxy;
     _backendName = snapshot.backend;
+    _nativeTapBackends = snapshot.nativeTapBackends;
     _capabilities = snapshot.capabilities;
     _registry.reset(snapshot.ports);
     if (snapshot.hasVirtualPorts) _virtualPorts = MidiVirtualPorts._(this);

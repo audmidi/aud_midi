@@ -25,8 +25,22 @@ void main() {
           hasVirtualPorts: true,
           hasBluetooth: false,
           session: null,
+          nativeTapBackends: const {'fake'},
         );
         expect(snapshot.proxy, 2);
+        expect(snapshot.nativeTapBackends, {'fake'});
+        expect(
+          const MidiHostSnapshot(
+            proxy: 1,
+            backend: 'fake',
+            capabilities: MidiCapabilities.none(),
+            ports: [],
+            hasVirtualPorts: false,
+            hasBluetooth: false,
+            session: null,
+          ).nativeTapBackends,
+          isEmpty,
+        );
         expect(snapshot.backend, 'fake');
         expect(snapshot.capabilities, MidiCapabilities(ump: true));
         expect(snapshot.ports, equals([port]));

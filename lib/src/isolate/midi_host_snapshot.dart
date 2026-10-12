@@ -18,6 +18,8 @@ final class MidiHostSnapshot {
   /// - [proxy] the id the host gave the proxy.
   /// - [backend] the name of the backend, e.g. `coremidi`.
   /// - [session] the network session, null when the backend has none.
+  /// - [nativeTapBackends] the names of the backends whose inputs take
+  ///   native taps: the prefixes of their port ids.
   const MidiHostSnapshot({
     required this.proxy,
     required this.backend,
@@ -26,6 +28,7 @@ final class MidiHostSnapshot {
     required this.hasVirtualPorts,
     required this.hasBluetooth,
     required this.session,
+    this.nativeTapBackends = const {},
   });
 
   // ...........................................................................
@@ -49,4 +52,8 @@ final class MidiHostSnapshot {
 
   /// The network session, or null when the backend has none.
   final MidiNetworkSessionInfo? session;
+
+  /// The names of the backends whose inputs take native taps, the prefixes
+  /// of their port ids.
+  final Set<String> nativeTapBackends;
 }

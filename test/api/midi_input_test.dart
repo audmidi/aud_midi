@@ -26,6 +26,59 @@ MidiBackend _backend() {
 
 FakeMidiBackend _fake(MidiBackend backend) => backend as FakeMidiBackend;
 
+/// A backend that has native taps but refuses them on its inputs.
+MidiBackend _refusingBackend() {
+  final fake = FakeMidiBackend(hasNativeTaps: false);
+  fake.addPort(fake.portInfo('in', direction: MidiDirection.input));
+  return fake;
+}
+
+/// A backend without native taps at all.
+MidiBackend _plainBackend() => _PlainBackend(_refusingBackend());
+
+final class _PlainBackend implements MidiBackend {
+  _PlainBackend(this._inner);
+
+  final MidiBackend _inner;
+
+  @override
+  Future<void> start(MidiBackendHost host) => _inner.start(host);
+
+  @override
+  Future<void> stop() => _inner.stop();
+
+  @override
+  Future<void> openPort(MidiPortId port) => _inner.openPort(port);
+
+  @override
+  Future<void> closePort(MidiPortId port) => _inner.closePort(port);
+
+  @override
+  Future<void> send(MidiPortId port, MidiPacket packet) =>
+      _inner.send(port, packet);
+
+  @override
+  Future<void> cancelPending(MidiPortId port) => _inner.cancelPending(port);
+
+  @override
+  String get name => _inner.name;
+
+  @override
+  MidiCapabilities get capabilities => _inner.capabilities;
+
+  @override
+  List<MidiPortInfo> get ports => _inner.ports;
+
+  @override
+  MidiVirtualPortsBackend? get virtualPorts => null;
+
+  @override
+  MidiBluetoothBackend? get bluetooth => null;
+
+  @override
+  MidiNetworkBackend? get network => null;
+}
+
 // .............................................................................
 // Actions that run inside the MIDI isolate.
 
@@ -55,6 +108,9 @@ Future<void> _failOpen(Midi midi) => midi.withBackend(
     backend,
   ).failWith(openPort: const MidiNativeError(api: 'open', code: 3)),
 );
+
+Future<Map<MidiPortId, MidiNativeTap>> _taps(Midi midi) =>
+    midi.withBackend((backend) => _fake(backend).taps);
 
 void main() {
   late Midi midi;
@@ -283,6 +339,72 @@ void main() {
           await settle();
           expect(events.single.message, isA<MidiNoteOn2>());
           await subscription.cancel();
+        });
+      });
+
+      group('supportsNativeTap, attachNativeTap(tap)', () {
+        const tap = MidiNativeTap(function: 0x10, user: 0x20);
+
+        test('attach the tap in the MIDI isolate until detach', () async {
+          expect(input.supportsNativeTap, isTrue);
+          final handle = await input.attachNativeTap(tap);
+          expect(handle.input, same(input));
+          expect(handle.tap, tap);
+          expect(handle.isDetached, isFalse);
+          expect(await _taps(midi), {input.id: tap});
+          await expectLater(
+            input.attachNativeTap(tap),
+            throwsA(isA<StateError>()),
+          );
+          await handle.detach();
+          expect(handle.isDetached, isTrue);
+          expect(await _taps(midi), isEmpty);
+          await handle.detach();
+          expect(
+            (await _calls(midi)).where((call) => call.startsWith('detach')),
+            hasLength(1),
+          );
+        });
+
+        test('refuse a backend without native taps at once', () async {
+          await midi.close();
+          midi = await Midi.open(
+            options: MidiOptions(backend: _plainBackend, inIsolate: inIsolate),
+          );
+          input = midi.inputs.single;
+          expect(input.supportsNativeTap, isFalse);
+          await expectLater(
+            input.attachNativeTap(tap),
+            throwsA(isA<MidiUnsupported>()),
+          );
+        });
+
+        test('pass on a backend that refuses the port', () async {
+          await midi.close();
+          midi = await Midi.open(
+            options: MidiOptions(
+              backend: _refusingBackend,
+              inIsolate: inIsolate,
+            ),
+          );
+          input = midi.inputs.single;
+          expect(input.supportsNativeTap, isTrue);
+          await expectLater(
+            input.attachNativeTap(tap),
+            throwsA(isA<MidiUnsupported>()),
+          );
+        });
+
+        test('fail for a port that is gone', () async {
+          final handle = await input.attachNativeTap(tap);
+          await _remove(midi, input.id);
+          await settle();
+          expect(input.supportsNativeTap, isTrue);
+          await expectLater(handle.detach(), throwsA(isA<MidiPortGone>()));
+          await expectLater(
+            input.attachNativeTap(tap),
+            throwsA(isA<MidiPortGone>()),
+          );
         });
       });
 

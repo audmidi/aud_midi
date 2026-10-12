@@ -148,6 +148,25 @@ void main() {
       );
     });
 
+    test('the native tap commands carry port and tap', () {
+      const tap = MidiNativeTap(function: 1, user: 2);
+      final attach = MidiAttachNativeTapCommand(
+        proxy: proxy,
+        request: request,
+        port: port,
+        tap: tap,
+      );
+      expect((attach.port, attach.tap), (port, tap));
+      expect(
+        MidiDetachNativeTapCommand(
+          proxy: proxy,
+          request: request,
+          port: port,
+        ).port,
+        port,
+      );
+    });
+
     test('the Bluetooth commands carry their peripheral', () {
       expect(
         MidiStopScanCommand(proxy: proxy, request: request),

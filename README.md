@@ -128,6 +128,15 @@ once and are handed to the operating system 100 ms before they are due,
 so they stay cancellable. On the web the engine runs on the main thread,
 where Web MIDI lives.
 
+A native consumer, e.g. an audio engine, takes the raw data of an input
+without any isolate in between: where `input.supportsNativeTap` holds
+(CoreMIDI, `android.media.midi`), `input.attachNativeTap(MidiNativeTap(
+function: ..., user: ...))` registers a C function that the backend calls
+on its receive thread with UMP words or MIDI 1.0 bytes and a host
+timestamp in nanoseconds, and with `gone` when the port disappears; the
+handle's `detach()` completes after the last call. The taps of a proxy
+leave with it.
+
 ## Contributing
 
 See [doc/guides/develop-guide.md](doc/guides/develop-guide.md).

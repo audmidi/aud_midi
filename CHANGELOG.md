@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Add native taps to MidiInput
+
+- MidiInput.supportsNativeTap and attachNativeTap through the MIDI isolate; MidiNativeTapHandle.detach
+- The constraints on core, apple and android at ^0.1.1
+
 ## 0.1.0 - 2026-10-07
 
 ### Changed
