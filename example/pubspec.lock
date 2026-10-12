@@ -30,35 +30,35 @@ packages:
       path: "../../aud_midi_android"
       relative: true
     source: path
-    version: "0.1.1"
+    version: "0.2.0"
   aud_midi_apple:
     dependency: "direct overridden"
     description:
       path: "../../aud_midi_apple"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   aud_midi_core:
     dependency: "direct overridden"
     description:
       path: "../../aud_midi_core"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   aud_midi_linux:
     dependency: "direct overridden"
     description:
       path: "../../aud_midi_linux"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   aud_midi_network:
     dependency: "direct overridden"
     description:
       path: "../../aud_midi_network"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   aud_midi_rtp:
     dependency: transitive
     description:
@@ -81,14 +81,14 @@ packages:
       path: "../../aud_midi_web"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   aud_midi_windows:
     dependency: "direct overridden"
     description:
       path: "../../aud_midi_windows"
       relative: true
     source: path
-    version: "0.1.0"
+    version: "0.1.1"
   bluez:
     dependency: transitive
     description:
