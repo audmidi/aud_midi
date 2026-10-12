@@ -22,6 +22,8 @@
 
 - Add a goodbye that answers when a tap fails to detach
 
+- Add independent constraints on the aud_midi packages
+
 ## 0.1.0 - 2026-10-07
 
 ### Changed
