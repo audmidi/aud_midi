@@ -18,7 +18,3 @@ dependency_overrides:
     path: ../aud_midi_web
   aud_midi_windows:
     path: ../aud_midi_windows
-  aud_midi_standard:
-    path: ../aud_midi_standard
-  aud_midi_rtp:
-    path: ../aud_midi_rtp
