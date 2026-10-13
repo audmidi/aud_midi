@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.1.2 - 2026-10-13
 
 ### Added
 
@@ -40,7 +40,6 @@
 - aud_midi_core, aud_midi_android and aud_midi_apple ^0.2.0
 
 - README: native taps in German, the Bluetooth system picker in both languages
-
 
 ## 0.1.0 - 2026-10-07
 
