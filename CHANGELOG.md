@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.1.2 - 2026-10-13
+
+### Added
+
+- Add examples that resolve outside a full ticket
+- The Flutter and the command line example override no siblings; the family comes from pub.dev
+
 ## 0.1.1 - 2026-10-12
 
 ### Added
