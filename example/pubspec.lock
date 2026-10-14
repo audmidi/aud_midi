@@ -92,10 +92,10 @@ packages:
     dependency: transitive
     description:
       name: aud_midi_windows
-      sha256: "61fcc68ca5e55487cb24afd8670db35ff523bb44ed15fb88031f76fb7bbf9af4"
+      sha256: b85f6f2ff5efbbe9ec759b99c45f92e5a3bc90ffbe8b8575d34a75679c757c09
       url: "https://pub.dev"
     source: hosted
-    version: "0.1.1"
+    version: "0.1.2"
   bluez:
     dependency: transitive
     description:

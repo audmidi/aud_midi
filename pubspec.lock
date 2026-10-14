@@ -100,10 +100,11 @@ packages:
   aud_midi_windows:
     dependency: "direct main"
     description:
-      path: "../aud_midi_windows"
-      relative: true
-    source: path
-    version: "0.1.1"
+      name: aud_midi_windows
+      sha256: b85f6f2ff5efbbe9ec759b99c45f92e5a3bc90ffbe8b8575d34a75679c757c09
+      url: "https://pub.dev"
+    source: hosted
+    version: "0.1.2"
   bluez:
     dependency: transitive
     description:
