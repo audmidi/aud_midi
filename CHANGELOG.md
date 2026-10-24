@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.1.4 - 2026-10-24
+
+### Changed
+
+- Make all repos run on Windows
+
 ## 0.1.3 - 2026-10-14
 
 ## 0.1.2 - 2026-10-13
