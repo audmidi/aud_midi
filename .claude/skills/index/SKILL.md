@@ -5,7 +5,7 @@ description: Creates or updates the repository index.jsonc from the index guide 
 
 <!--
 @license
-Copyright (c) Audanika. All Rights Reserved.
+Copyright (c) audanika
 
 Use of this source code is governed by terms that can be
 found in the LICENSE file in the root of this package.

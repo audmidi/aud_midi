@@ -1,6 +1,6 @@
 <!--
 @license
-Copyright (c) Audanika. All Rights Reserved.
+Copyright (c) audanika
 
 Use of this source code is governed by terms that can be
 found in the LICENSE file in the root of this package.
@@ -22,9 +22,11 @@ gg do init workspace
 ```
 
 This creates the `.ocean` folder and instantiates the latest `dna_gg` in
-the workspace folder: the gg guides, the skills and the managed block of
+the workspace folder: the gg guides, the skills, the hooks that keep your
+prompts in the project management repo and the managed block of
 `CLAUDE.md`. It is the same as running `gg dna init`, `gg dna add dna_gg`
-and `gg dna build` by hand.
+and `gg dna build` by hand. Every ticket gets a copy of the skills and
+the hooks.
 
 ## Add your repositories
 

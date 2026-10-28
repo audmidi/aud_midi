@@ -1,6 +1,6 @@
 <!--
 @license
-Copyright (c) Audanika. All Rights Reserved.
+Copyright (c) audanika
 
 Use of this source code is governed by terms that can be
 found in the LICENSE file in the root of this package.
@@ -47,6 +47,13 @@ For the structure of the code under test see the
 
 - Wrap the test call in a loop to cover several inputs
 - Put the varying value into the test name
+
+## Start from the example
+
+- Build objects through their `example` constructor and pass only the
+  values the test is about
+- When a class has no example yet, add one instead of building the
+  object by hand in the test
 
 ## Prefer real types over mocks
 

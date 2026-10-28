@@ -1,6 +1,6 @@
 <!--
 @license
-Copyright (c) Audanika. All Rights Reserved.
+Copyright (c) audanika
 
 Use of this source code is governed by terms that can be
 found in the LICENSE file in the root of this package.
@@ -34,6 +34,10 @@ Read that one first; this only fills in the specifics.
 - Reset shared state in `beforeEach`
 - Release external resources in `afterEach`
 - Put reusable setup into a local closure inside the spec file
+
+## Start from the example
+
+- `const user = User.example({ age: 17 });`
 
 ## Prefer real types over mocks
 
