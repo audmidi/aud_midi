@@ -43,9 +43,8 @@ void main() {
         const engine = MidiEngineOptions(lateThreshold: Duration(seconds: 1));
         for (final inMidiIsolate in [true, false]) {
           expect(
-            const MidiOptions(
-              engine: engine,
-            ).engineFor(inMidiIsolate: inMidiIsolate),
+            const MidiOptions(engine: engine)
+                .engineFor(inMidiIsolate: inMidiIsolate),
             same(engine),
           );
         }

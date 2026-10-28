@@ -307,9 +307,8 @@ Future<Map<String, Object?>> _hotplug(Midi midi, _FarEnd far) async {
   await far.command(['remove', name]);
   var gone = Duration.zero;
   while (await events.moveNext().timeout(const Duration(seconds: 5))) {
-    if (events.current case MidiPortRemoved(
-      :final port,
-    ) when port.name == name) {
+    if (events.current case MidiPortRemoved(:final port)
+        when port.name == name) {
       gone = midi.now().difference(removed);
       break;
     }
@@ -397,10 +396,8 @@ Future<void> _farEndMain((SendPort, int) setup) async {
     final arrival = midi.now().microseconds;
     if (echo) unawaited(source.send(event.message));
     final recording = records;
-    if (event.message case MidiNoteOn(
-      :final note,
-      channel: 2,
-    ) when recording != null) {
+    if (event.message case MidiNoteOn(:final note, channel: 2)
+        when recording != null) {
       recording.add([recording.length, event.time.microseconds, arrival, note]);
     }
     switch (event.message) {

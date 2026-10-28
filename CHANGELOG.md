@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+### Changed
+
+- Require Dart 3.13 and upgrade the dependencies
+
+- Require Dart 3.13
+- Upgrade dna_audanika to ^0.1.0
+- Upgrade helix to ^1.14.0
+- Set the identity the DNA layers ask for in dna/_vars.json
+- Reformat 9 files with the Dart 3.13 formatter
+- Add the blog post of this change, in English and German
+- Bring the README to the README template, in English and German
+- Replace organisation identifiers in examples by placeholders
+
 ## 0.1.4 - 2026-10-24
 
 ### Changed
@@ -48,6 +63,7 @@
 - aud_midi_core, aud_midi_android and aud_midi_apple ^0.2.0
 
 - README: native taps in German, the Bluetooth system picker in both languages
+
 
 ## 0.1.0 - 2026-10-07
 

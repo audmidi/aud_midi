@@ -16,7 +16,11 @@ void main() {
     var proxy = 3;
     var request = 4;
     const port = MidiPortId('fake:out');
-    const host = MidiNetworkHostInfo(name: 'h', address: '1.2.3.4', port: 5004);
+    const host = MidiNetworkHostInfo(
+      name: 'h',
+      address: '203.0.113.4',
+      port: 5004,
+    );
     final notices = <MidiHostNotice>[];
     const message = MidiNoteOn(channel: 0, note: 60, velocity: 1);
     final packet = MidiBytesPacket(

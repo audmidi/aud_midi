@@ -104,9 +104,9 @@ Future<void> _remove(Midi midi, MidiPortId port) =>
     midi.withBackend((backend) => _fake(backend).removePort(port));
 
 Future<void> _failOpen(Midi midi) => midi.withBackend(
-  (backend) => _fake(
-    backend,
-  ).failWith(openPort: const MidiNativeError(api: 'open', code: 3)),
+  (backend) =>
+      _fake(backend)
+          .failWith(openPort: const MidiNativeError(api: 'open', code: 3)),
 );
 
 Future<void> _failDetach(Midi midi, Object? error) => midi.withBackend(
@@ -206,9 +206,8 @@ void main() {
           await b.cancel();
           await untilOpen(open: false);
           expect(
-            (await _calls(
-              midi,
-            )).where((call) => call == 'openPort ${input.id}'),
+            (await _calls(midi))
+                .where((call) => call == 'openPort ${input.id}'),
             hasLength(1),
           );
           final again = input.messages.listen((_) {});

@@ -12,7 +12,7 @@ void main() {
     final connection = MidiNetworkConnectionInfo(
       host: const MidiNetworkHostInfo(
         name: 'Studio',
-        address: '10.0.0.2',
+        address: '192.0.2.2',
         port: 5004,
       ),
       state: MidiNetworkConnectionState.failed,
@@ -30,7 +30,7 @@ void main() {
       test('names the host', () {
         expect(
           MidiNetworkConnectionFailed(connection).toString(),
-          'MidiNetworkConnectionFailed: Studio at 10.0.0.2:5004 did not '
+          'MidiNetworkConnectionFailed: Studio at 192.0.2.2:5004 did not '
           'accept the connection',
         );
       });

@@ -559,10 +559,8 @@ final class _HostProxy {
   /// Queues [value] of the stream [id], merged into a stream notice of the
   /// same stream that waits already.
   void _postValue(int id, Object? value) {
-    if (_outbox.lastOrNull case MidiStreamNotice(
-      :final stream,
-      :final values,
-    ) when stream == id) {
+    if (_outbox.lastOrNull case MidiStreamNotice(:final stream, :final values)
+        when stream == id) {
       values.add(value);
       return;
     }

@@ -9,7 +9,7 @@ import 'package:test/test.dart';
 
 const _remote = MidiNetworkHostInfo(
   name: 'Studio',
-  address: '10.0.0.2',
+  address: '192.0.2.2',
   port: 5004,
   source: MidiNetworkHostSource.bonjour,
 );
@@ -101,25 +101,25 @@ void main() {
         test('connect sessions and add their ports', () async {
           final network = midi.network!;
           await network.enable(name: 'Desk');
-          final manual = await network.connect('10.0.0.3', 5004);
-          expect(manual.host.address, '10.0.0.3');
+          final manual = await network.connect('192.0.2.3', 5004);
+          expect(manual.host.address, '192.0.2.3');
           expect(manual.host.source, MidiNetworkHostSource.manual);
           final found = await network.connectTo(_remote);
           expect(found.state, MidiNetworkConnectionState.connected);
           await Future<void>.delayed(const Duration(milliseconds: 20));
           expect(midi.inputs.map((input) => input.info.name), [
-            '10.0.0.3',
+            '192.0.2.3',
             'Studio',
           ]);
           await network.disconnect(_remote);
           await Future<void>.delayed(const Duration(milliseconds: 20));
-          expect(midi.inputs.map((input) => input.info.name), ['10.0.0.3']);
+          expect(midi.inputs.map((input) => input.info.name), ['192.0.2.3']);
         });
 
         test('fail for a session that refuses', () async {
           await midi.network!.enable(name: 'Desk');
           await expectLater(
-            midi.network!.connect('10.0.0.9', 9),
+            midi.network!.connect('192.0.2.9', 9),
             throwsA(
               isA<MidiNetworkConnectionFailed>().having(
                 (e) => e.connection.host.port,

@@ -150,11 +150,9 @@ void main() {
     };
   }
 
-  Future<MidiHostSnapshot> hello([MidiNoticeSink? to]) async =>
-      await ask(
-            (request) => MidiHelloCommand(request: request, sink: to ?? sink),
-          )
-          as MidiHostSnapshot;
+  Future<MidiHostSnapshot> hello([MidiNoticeSink? to]) async => await ask(
+    (request) => MidiHelloCommand(request: request, sink: to ?? sink),
+  ) as MidiHostSnapshot;
 
   // Lets the microtasks and timers of a few turns run; notices leave in
   // a timer after the turn that posted them.
@@ -764,7 +762,7 @@ void main() {
       test('forwards the hosts', () async {
         const remote = MidiNetworkHostInfo(
           name: 'r',
-          address: '10.0.0.2',
+          address: '192.0.2.2',
           port: 5004,
         );
         await ask(
@@ -997,12 +995,9 @@ void main() {
             time: MidiTime.zero,
           ),
         );
-        final snapshot =
-            await ask(
-                  (request) =>
-                      MidiDiagnosticsCommand(proxy: proxy, request: request),
-                )
-                as MidiDiagnosticsSnapshot;
+        final snapshot = await ask(
+          (request) => MidiDiagnosticsCommand(proxy: proxy, request: request),
+        ) as MidiDiagnosticsSnapshot;
         expect(snapshot.count(MidiDiagnosticKind.networkLoss), 1);
         expect(
           await ask(
@@ -1021,18 +1016,16 @@ void main() {
       });
 
       test('creates and removes virtual ports', () async {
-        final port =
-            await ask(
-                  (request) => MidiCreateVirtualPortCommand(
-                    proxy: proxy,
-                    request: request,
-                    spec: MidiVirtualPortSpec(
-                      name: 'v',
-                      direction: MidiDirection.output,
-                    ),
-                  ),
-                )
-                as MidiPortInfo;
+        final port = await ask(
+          (request) => MidiCreateVirtualPortCommand(
+            proxy: proxy,
+            request: request,
+            spec: MidiVirtualPortSpec(
+              name: 'v',
+              direction: MidiDirection.output,
+            ),
+          ),
+        ) as MidiPortInfo;
         expect(port.isOwn, isTrue);
         await ask(
           (request) => MidiRemoveVirtualPortCommand(
@@ -1053,16 +1046,14 @@ void main() {
 
       test('connects and disconnects peripherals', () async {
         fake.bluetooth!.addPeripheral(MidiBlePeripheralInfo(id: 'p1'));
-        final ports =
-            await ask(
-                  (request) => MidiConnectPeripheralCommand(
-                    proxy: proxy,
-                    request: request,
-                    peripheral: 'p1',
-                    timeout: const Duration(seconds: 1),
-                  ),
-                )
-                as List<MidiPortInfo>;
+        final ports = await ask(
+          (request) => MidiConnectPeripheralCommand(
+            proxy: proxy,
+            request: request,
+            peripheral: 'p1',
+            timeout: const Duration(seconds: 1),
+          ),
+        ) as List<MidiPortInfo>;
         expect(ports.map((port) => port.direction), [
           MidiDirection.input,
           MidiDirection.output,
@@ -1083,30 +1074,26 @@ void main() {
       test('runs the network session and forwards its changes', () async {
         const remote = MidiNetworkHostInfo(
           name: 'r',
-          address: '10.0.0.2',
+          address: '192.0.2.2',
           port: 5004,
         );
-        final session =
-            await ask(
-                  (request) => MidiEnableNetworkCommand(
-                    proxy: proxy,
-                    request: request,
-                    name: 'Studio',
-                    policy: MidiNetworkConnectionPolicy.anyone,
-                    port: 5008,
-                  ),
-                )
-                as MidiNetworkSessionInfo;
+        final session = await ask(
+          (request) => MidiEnableNetworkCommand(
+            proxy: proxy,
+            request: request,
+            name: 'Studio',
+            policy: MidiNetworkConnectionPolicy.anyone,
+            port: 5008,
+          ),
+        ) as MidiNetworkSessionInfo;
         expect((session.localName, session.port), ('Studio', 5008));
-        final connection =
-            await ask(
-                  (request) => MidiConnectHostCommand(
-                    proxy: proxy,
-                    request: request,
-                    host: remote,
-                  ),
-                )
-                as MidiNetworkConnectionInfo;
+        final connection = await ask(
+          (request) => MidiConnectHostCommand(
+            proxy: proxy,
+            request: request,
+            host: remote,
+          ),
+        ) as MidiNetworkConnectionInfo;
         expect(connection.state, MidiNetworkConnectionState.connected);
         await ask(
           (request) => MidiDisconnectHostCommand(
