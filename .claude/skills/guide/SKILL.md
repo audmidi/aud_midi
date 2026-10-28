@@ -5,7 +5,7 @@ description: Writes a new guide or reviews an existing one against the writing r
 
 <!--
 @license
-Copyright (c) Audanika. All Rights Reserved.
+Copyright (c) audanika
 
 Use of this source code is governed by terms that can be
 found in the LICENSE file in the root of this package.

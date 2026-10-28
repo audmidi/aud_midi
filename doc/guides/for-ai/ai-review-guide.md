@@ -1,6 +1,6 @@
 <!--
 @license
-Copyright (c) Audanika. All Rights Reserved.
+Copyright (c) audanika
 
 Use of this source code is governed by terms that can be
 found in the LICENSE file in the root of this package.
@@ -34,6 +34,13 @@ found in the LICENSE file in the root of this package.
   early returns.
 - Names that do not match the conventions or the purpose.
 - Magic numbers / strings that would be clearer as named constants.
+
+### Placeholder identifiers
+
+- Bundle IDs, application IDs, package names, domains, URLs, mail and
+  IP addresses of the organization in examples, tests or docs — replace
+  them by `com.example.<app>`, `example.com` and the documentation IP
+  ranges.
 
 ### Performance
 

@@ -63,9 +63,8 @@ void main() {
         equals([diagnostic]),
       );
       expect(
-        MidiCapabilitiesNotice(
-          capabilities: MidiCapabilities(ump: true),
-        ).capabilities,
+        MidiCapabilitiesNotice(capabilities: MidiCapabilities(ump: true))
+            .capabilities,
         MidiCapabilities(ump: true),
       );
       expect(MidiSessionNotice(session: session).session, session);

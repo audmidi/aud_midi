@@ -15,7 +15,7 @@ void main() {
   late MidiBrowseLockNetwork network;
   const remote = MidiNetworkHostInfo(
     name: 'r',
-    address: '10.0.0.9',
+    address: '192.0.2.9',
     port: 5004,
   );
 

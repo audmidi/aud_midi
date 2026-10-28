@@ -1,5 +1,0 @@
-# The example depends on aud_midi of this checkout by path and takes the
-# rest of the family from pub.dev, like an app does. A ticket that changes
-# a sibling as well adds its checkout here as a path override while it
-# runs; overrides of checkouts a ticket does not have break pub get.
-dependency_overrides: {}

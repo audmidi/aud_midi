@@ -5,7 +5,7 @@ description: Checks the tests of this repo against the test guide and reports ga
 
 <!--
 @license
-Copyright (c) Audanika. All Rights Reserved.
+Copyright (c) audanika
 
 Use of this source code is governed by terms that can be
 found in the LICENSE file in the root of this package.
@@ -26,8 +26,9 @@ without its own test file — coverage counts per file name.
 ## 2. Check the content
 
 Report tests that assert element by element where a structural compare
-belongs, printing in tests, mocks that a constructor parameter could
-replace, and coverage ignores on paths that dependency injection could
+belongs, printing in tests, objects built by hand where the class's
+`example` would do, mocks that a constructor parameter could replace,
+and coverage ignores on paths that dependency injection could
 reach.
 
 ## 3. Run the checks

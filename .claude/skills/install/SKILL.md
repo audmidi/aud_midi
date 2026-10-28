@@ -5,7 +5,7 @@ description: Walks the install guides and reports what is still missing on this 
 
 <!--
 @license
-Copyright (c) Audanika. All Rights Reserved.
+Copyright (c) audanika
 
 Use of this source code is governed by terms that can be
 found in the LICENSE file in the root of this package.

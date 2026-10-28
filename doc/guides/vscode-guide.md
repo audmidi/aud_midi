@@ -1,6 +1,6 @@
 <!--
 @license
-Copyright (c) Audanika. All Rights Reserved.
+Copyright (c) audanika
 
 Use of this source code is governed by terms that can be
 found in the LICENSE file in the root of this package.
@@ -18,7 +18,7 @@ with.
 - 80 character rulers, no trailing whitespace, a final newline
 - Coverage gutters and the testing panel
 - A license header template for every language this family writes,
-  using `audanika` and `Audanika. All Rights Reserved.`
+  using `audanika` and `audanika`
 - `dna/_dna.json` is associated with `jsonc`, so its comments do not show
   as errors
 

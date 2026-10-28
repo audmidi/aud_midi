@@ -199,9 +199,8 @@ final class Midi {
   static Future<Midi> open({MidiOptions options = const MidiOptions()}) async {
     final shared = _sharedHost == null ? null : _proxies[_sharedHost];
     if (shared != null) return shared.._references += 1;
-    final launched = await (_launching ??= _launch(
-      options,
-    ).whenComplete(() => _launching = null));
+    final launched = await (_launching ??= _launch(options)
+        .whenComplete(() => _launching = null));
     return launched.._references += 1;
   }
 

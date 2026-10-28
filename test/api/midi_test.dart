@@ -126,9 +126,9 @@ Future<void> _addInput(Midi midi, String name) => midi.withBackend((backend) {
 });
 
 Future<void> _rename(Midi midi, MidiPortId id, String name) => midi.withBackend(
-  (backend) => _fakeOf(
-    backend,
-  ).changePort(_fakeOf(backend).port(id)!.copyWith(name: name)),
+  (backend) =>
+      _fakeOf(backend)
+          .changePort(_fakeOf(backend).port(id)!.copyWith(name: name)),
 );
 
 Future<void> _remove(Midi midi, MidiPortId id) =>
