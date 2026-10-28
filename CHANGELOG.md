@@ -25,7 +25,15 @@
 - Upgrade aud_midi_standard to 0.2.0
 
 - Lift the lock file to the newest resolvable versions
+
 - Let the examples resolve the sibling packages by path
+
+- Resolve the example together with the package
+
+- Add the example to a pub workspace, resolution: workspace in the example
+- Drop the lock file of the example, the package lock covers it
+- Move the dependency overrides of the example to the workspace root
+- Keep test within the test_api that flutter_test pins
 
 ## 0.1.4 - 2026-10-24
 
