@@ -7,7 +7,7 @@
 import 'dart:async';
 
 import 'package:aud_midi/aud_midi.dart';
-import 'package:flutter/material.dart';
+import 'package:material_ui/material_ui.dart';
 
 void main() => runApp(const MidiExampleApp());
 

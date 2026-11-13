@@ -4,7 +4,8 @@ publish_to: 'none'
 version: 1.0.0+1
 
 environment:
-  sdk: ^3.13.0
+  sdk: ^3.14.0
+  flutter: ">=3.50.0"
 
 resolution: workspace
 
@@ -14,6 +15,7 @@ dependencies:
   aud_midi:
     path: ../
 
+  material_ui: any
 dev_dependencies:
   flutter_test:
     sdk: flutter
