@@ -15,7 +15,7 @@ dependencies:
   aud_midi:
     path: ../
 
-  material_ui: any
+  material_ui: ^1.11.0
 dev_dependencies:
   flutter_test:
     sdk: flutter
