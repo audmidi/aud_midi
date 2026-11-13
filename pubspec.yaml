@@ -18,12 +18,12 @@ workspace:
   - example/cli
 
 dependencies:
-  aud_midi_android: ^0.3.0
+  aud_midi_android: ^0.3.1
   aud_midi_apple: ^0.2.0
   aud_midi_core: ^0.2.0
   aud_midi_linux: ^0.2.0
   aud_midi_network: ^0.2.0
-  aud_midi_standard: ^0.3.0
+  aud_midi_standard: ^0.3.1
   aud_midi_web: ^0.2.0
   aud_midi_windows: ^0.2.0
 
