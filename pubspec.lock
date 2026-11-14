@@ -36,66 +36,75 @@ packages:
   aud_midi_android:
     dependency: "direct main"
     description:
-      path: "../aud_midi_android"
-      relative: true
-    source: path
-    version: "0.3.1"
+      name: aud_midi_android
+      sha256: "8a6cf40fc7b713ac9b5721facfe5c4f1569649eb5cc5cc319c1a77d8199d6f1c"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   aud_midi_apple:
     dependency: "direct main"
     description:
-      path: "../aud_midi_apple"
-      relative: true
-    source: path
-    version: "0.2.0"
+      name: aud_midi_apple
+      sha256: "53e8ca1bd3a7e694f86450a960755ccb29713693227e5b18d703a37a8f6bf7d4"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   aud_midi_core:
     dependency: "direct main"
     description:
-      path: "../aud_midi_core"
-      relative: true
-    source: path
-    version: "0.2.0"
+      name: aud_midi_core
+      sha256: f19f9acc1fd37755fdfe254d56d655669d8ffe0f18d0f4492fe2016d76e9f60b
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   aud_midi_linux:
     dependency: "direct main"
     description:
-      path: "../aud_midi_linux"
-      relative: true
-    source: path
-    version: "0.2.0"
+      name: aud_midi_linux
+      sha256: "5ad50417083a3575cc62ce1cde90eff2e50ed4709e5df465adc31179682fff22"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   aud_midi_network:
     dependency: "direct main"
     description:
-      path: "../aud_midi_network"
-      relative: true
-    source: path
-    version: "0.2.0"
+      name: aud_midi_network
+      sha256: "481a2c3aa7b021bbcead5c51f3157936f88099301bdb5d4e67b351980fa23613"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   aud_midi_rtp:
-    dependency: "direct overridden"
+    dependency: transitive
     description:
-      path: "../aud_midi_rtp"
-      relative: true
-    source: path
-    version: "0.2.0"
+      name: aud_midi_rtp
+      sha256: "6b09a6c0c4471bf84903f0337ed25417b3a035675d0c212afae2595974365027"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   aud_midi_standard:
     dependency: "direct main"
     description:
-      path: "../aud_midi_standard"
-      relative: true
-    source: path
-    version: "0.3.1"
+      name: aud_midi_standard
+      sha256: "1452ebbe0748eaa073552907c9024eca676c238b599596cb226857f9f857b7a7"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   aud_midi_web:
     dependency: "direct main"
     description:
-      path: "../aud_midi_web"
-      relative: true
-    source: path
-    version: "0.2.0"
+      name: aud_midi_web
+      sha256: f0b12bd8440a9c6f2fc3a09575e9bc8896f713a7d4eb495b5ec45cff84a118c6
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   aud_midi_windows:
     dependency: "direct main"
     description:
-      path: "../aud_midi_windows"
-      relative: true
-    source: path
-    version: "0.2.0"
+      name: aud_midi_windows
+      sha256: "9f648c3ef1775670c6e42bcc127b601c9d8c43a183383c362549d0f747382d68"
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.0.0"
   bluez:
     dependency: transitive
     description:
