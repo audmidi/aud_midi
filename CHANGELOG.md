@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 1.0.0 - 2026-11-14
 
 ### Changed
 
@@ -44,7 +44,6 @@
 - Move the dependency overrides of the example to the workspace root
 
 - Keep test within the test_api that flutter_test pins
-
 
 ## 0.1.4 - 2026-10-24
 
@@ -94,7 +93,6 @@
 - aud_midi_core, aud_midi_android and aud_midi_apple ^0.2.0
 
 - README: native taps in German, the Bluetooth system picker in both languages
-
 
 ## 0.1.0 - 2026-10-07
 
